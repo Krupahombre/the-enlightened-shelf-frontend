@@ -1,90 +1,92 @@
-import { useState } from "react";
 import { Button, Card, CardBody, Input } from "@nextui-org/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import SignUp from "../../interfaces/register/SignUp";
+import Client from "../../api/Client";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    email: "",
-    username: "",
-    first_name: "",
-    last_name: "",
-    password: "",
-  });
+  const { register, handleSubmit } = useForm();
+  const navigate = useNavigate();
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const onSubmit = async (data: any) => {
+    const registerData: SignUp = {
+      email: data.email,
+      username: data.username,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      password: data.password,
+    };
 
-  const handleSubmit = () => {
-    console.log(formData);
+    const response = await Client.register(registerData);
+
+    localStorage.setItem("username", response.data.username);
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("role", response.data.role);
+
+    navigate("/");
   };
 
   return (
     <div className="flex justify-center items-center h-screen">
       <Card className="w-[400px] max-h-[100%]">
         <CardBody>
-          <p className="text-center p-4 font-bold text-3xl mb-2">Register</p>
-          <div className="mb-2 flex justify-center">
-            <Input
-              name="email"
-              label="Email"
-              variant="bordered"
-              value={formData.email}
-              onChange={handleChange}
-              className="max-w-xs"
-            />
-          </div>
-          <div className="mb-2 flex justify-center">
-            <Input
-              name="username"
-              label="Username"
-              variant="bordered"
-              value={formData.username}
-              onChange={handleChange}
-              className="max-w-xs"
-            />
-          </div>
-          <div className="mb-2 flex justify-center">
-            <Input
-              name="first_name"
-              label="First Name"
-              variant="bordered"
-              value={formData.first_name}
-              onChange={handleChange}
-              className="max-w-xs"
-            />
-          </div>
-          <div className="mb-2 flex justify-center">
-            <Input
-              name="last_name"
-              label="Last Name"
-              variant="bordered"
-              value={formData.last_name}
-              onChange={handleChange}
-              className="max-w-xs"
-            />
-          </div>
-          <div className="mb-4 flex justify-center">
-            <Input
-              name="password"
-              type="password"
-              label="Password"
-              variant="bordered"
-              value={formData.password}
-              onChange={handleChange}
-              className="max-w-xs"
-            />
-          </div>
+          <form>
+            <p className="text-center p-4 font-bold text-3xl mb-2">Register</p>
+            <div className="mb-2 flex justify-center">
+              <Input
+                {...register("email")}
+                name="email"
+                label="Email"
+                variant="bordered"
+                className="max-w-xs"
+              />
+            </div>
+            <div className="mb-2 flex justify-center">
+              <Input
+                {...register("username")}
+                name="username"
+                label="Username"
+                variant="bordered"
+                className="max-w-xs"
+              />
+            </div>
+            <div className="mb-2 flex justify-center">
+              <Input
+                {...register("first_name")}
+                name="first_name"
+                label="First Name"
+                variant="bordered"
+                className="max-w-xs"
+              />
+            </div>
+            <div className="mb-2 flex justify-center">
+              <Input
+                {...register("last_name")}
+                name="last_name"
+                label="Last Name"
+                variant="bordered"
+                className="max-w-xs"
+              />
+            </div>
+            <div className="mb-4 flex justify-center">
+              <Input
+                {...register("password")}
+                name="password"
+                type="password"
+                label="Password"
+                variant="bordered"
+                className="max-w-xs"
+              />
+            </div>
+          </form>
           <div className="flex justify-center">
             <Button
+              as={Link}
+              to="/"
               color="primary"
               variant="flat"
               className="w-24 h-10"
-              onClick={handleSubmit}
+              onClick={handleSubmit(onSubmit)}
             >
               Register
             </Button>

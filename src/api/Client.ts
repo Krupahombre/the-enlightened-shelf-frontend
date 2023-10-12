@@ -1,6 +1,6 @@
 import axios from "axios";
 import Auth from "../interfaces/auth/Auth";
-import Register from "../interfaces/register/Register";
+import Register from "../interfaces/register/SignUp";
 import AuthResponse from "../interfaces/auth/AuthResponse";
 import ResponseWrapper from "../interfaces/ResponseWrapper";
 
