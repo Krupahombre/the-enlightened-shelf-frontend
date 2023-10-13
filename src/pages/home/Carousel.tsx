@@ -1,3 +1,3 @@
 export default function Carousel() {
-  return <div>kutas</div>;
+  return <div>HELLO THERE!</div>;
 }
