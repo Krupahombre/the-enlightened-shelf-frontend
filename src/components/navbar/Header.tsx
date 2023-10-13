@@ -6,8 +6,16 @@ import {
   NavbarItem,
 } from "@nextui-org/react";
 import { Link, Outlet } from "react-router-dom";
+import { useStorage } from "../../storage/Storage";
+import { observer } from "mobx-react-lite";
 
-export default function Header() {
+export default observer(function Header() {
+  const { userStorage } = useStorage();
+
+  const handleLogout = () => {
+    userStorage.logoutUser();
+  };
+
   return (
     <>
       <Navbar position="static" isBordered>
@@ -30,26 +38,38 @@ export default function Header() {
               Your Shelf
             </Link>
           </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" to="/">
-              Admin Page
-            </Link>
-          </NavbarItem>
+          {userStorage.isAdmin() && (
+            <NavbarItem>
+              <Link color="foreground" to="/">
+                Admin Page
+              </Link>
+            </NavbarItem>
+          )}
         </NavbarContent>
         <NavbarContent justify="end">
-          <NavbarItem>
-            <Button as={Link} to="/login" variant="bordered">
-              Login
-            </Button>
-          </NavbarItem>
-          <NavbarItem className="hidden lg:flex">
-            <Button as={Link} color="primary" to="/register" variant="flat">
-              Register
-            </Button>
-          </NavbarItem>
+          {!userStorage.isLoggedIn() ? (
+            <>
+              <NavbarItem>
+                <Button as={Link} to="/login" variant="bordered">
+                  Login
+                </Button>
+              </NavbarItem>
+              <NavbarItem className="hidden lg:flex">
+                <Button as={Link} color="primary" to="/register" variant="flat">
+                  Register
+                </Button>
+              </NavbarItem>
+            </>
+          ) : (
+            <NavbarItem className="hidden lg:flex">
+              <Button color="primary" onClick={handleLogout} variant="flat">
+                Logout
+              </Button>
+            </NavbarItem>
+          )}
         </NavbarContent>
       </Navbar>
       <Outlet />
     </>
   );
-}
+});

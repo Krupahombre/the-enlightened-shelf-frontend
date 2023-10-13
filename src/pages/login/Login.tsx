@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import Client from "../../api/Client";
 import Auth from "../../interfaces/auth/Auth";
 import { useForm } from "react-hook-form";
+import { useStorage } from "../../storage/Storage";
 
 export default function Login() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
+  const { userStorage } = useStorage();
 
   const onSubmit = async (data: any) => {
     const authData: Auth = {
@@ -16,9 +18,7 @@ export default function Login() {
 
     const response = await Client.login(authData);
 
-    localStorage.setItem("username", response.data.username);
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("role", response.data.role);
+    userStorage.setUser(response.data);
 
     navigate("/");
   };
