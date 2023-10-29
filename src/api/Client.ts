@@ -3,6 +3,8 @@ import Auth from "../interfaces/auth/Auth";
 import Register from "../interfaces/register/SignUp";
 import AuthResponse from "../interfaces/auth/AuthResponse";
 import ResponseWrapper from "../interfaces/ResponseWrapper";
+import AddBook from "../interfaces/book/AddBook";
+import BookResponse from "../interfaces/book/BookResponse";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -24,6 +26,10 @@ const Client = {
   register: (register: Register) =>
     axios
       .post<ResponseWrapper<AuthResponse>>(`/auth/register`, register)
+      .then((response) => response.data),
+  addBook: (addBook: AddBook) =>
+    axios
+      .post<ResponseWrapper<BookResponse>>(`/books/`, addBook)
       .then((response) => response.data),
 };
 

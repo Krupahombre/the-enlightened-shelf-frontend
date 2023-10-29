@@ -29,18 +29,18 @@ export default observer(function Header() {
             </Link>
           </NavbarItem>
           <NavbarItem isActive>
-            <Link to="/" aria-current="page">
+            <Link to="/find-books" aria-current="page">
               Find Books
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" to="/">
+            <Link color="foreground" to="/your-shelf">
               Your Shelf
             </Link>
           </NavbarItem>
           {userStorage.isAdmin() && (
             <NavbarItem>
-              <Link color="foreground" to="/">
+              <Link color="foreground" to="/admin-page">
                 Admin Page
               </Link>
             </NavbarItem>
