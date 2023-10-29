@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -6,7 +6,9 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  Input,
 } from "@nextui-org/react";
+import Client from "../../../api/Client";
 
 interface GoogleSearchModalProps {
   isOpen: boolean;
@@ -19,6 +21,14 @@ const GoogleSearchModal: React.FC<GoogleSearchModalProps> = ({
   onOpenChange,
   onClose,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const searchBook = async () => {
+    const response = await Client.searchGoogleApi(searchTerm);
+
+    console.log(response);
+  };
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
@@ -26,15 +36,18 @@ const GoogleSearchModal: React.FC<GoogleSearchModalProps> = ({
           Find Book in Google API
         </ModalHeader>
         <ModalBody>
-          {/* Place your form or content for finding book in Google API here */}
-          <p>Replace this with your book search form or content</p>
+          <Input
+            placeholder="Enter search term"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Button color="primary" onPress={searchBook} className="mt-3">
+            Search
+          </Button>
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>
             Close
-          </Button>
-          <Button color="primary" onPress={onClose}>
-            Action
           </Button>
         </ModalFooter>
       </ModalContent>
