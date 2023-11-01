@@ -33,7 +33,7 @@ const Client = {
     axios
       .post<ResponseWrapper<BookResponse>>(`/books/`, addBook)
       .then((response) => response.data),
-  searchGoogleApi: (searchTerm: string, maxResults: number = 5) =>
+  searchGoogleApi: (searchTerm: string, maxResults: number = 15) =>
     axios
       .get(
         `${GOOGLE_API_URL}/volumes?q=${searchTerm}&key=${GOOGLE_API_KEY}&maxResults=${maxResults}`

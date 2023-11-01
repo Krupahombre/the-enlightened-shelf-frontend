@@ -3,9 +3,18 @@ import { Button, useDisclosure } from "@nextui-org/react";
 import GoogleSearchModal from "../modals/GoogleSearchModal";
 import AddBookModal from "../modals/AddBookModal";
 
+export interface SelectedBookItem {
+  title: string;
+  author: string;
+  description: string;
+  quantity: number;
+  imageLink: string;
+}
+
 export default function AddBook() {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [addByGoogle, setAddByGoogle] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<SelectedBookItem>();
 
   const openGoogleModal = () => {
     setAddByGoogle(true);
@@ -15,6 +24,17 @@ export default function AddBook() {
   const openManualModal = () => {
     setAddByGoogle(false);
     onOpen();
+  };
+
+  const handleSelectedBook = (book: SelectedBookItem) => {
+    setAddByGoogle(false);
+    onOpen();
+    setSelectedBook(book);
+  };
+
+  const handleOnClose = () => {
+    onClose();
+    setSelectedBook(undefined);
   };
 
   return (
@@ -27,15 +47,14 @@ export default function AddBook() {
       {addByGoogle ? (
         <GoogleSearchModal
           isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          onClose={onClose}
+          onClose={handleOnClose}
+          onSelect={handleSelectedBook}
         />
       ) : (
         <AddBookModal
           isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          onClose={onClose}
-          //   addByGoogle={addByGoogle}
+          onClose={handleOnClose}
+          selectedBook={selectedBook}
         />
       )}
     </div>

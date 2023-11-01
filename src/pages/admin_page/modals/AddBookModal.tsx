@@ -9,17 +9,18 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
+import { SelectedBookItem } from "../components/AddBook";
 
 interface AddBookModalProps {
   isOpen: boolean;
-  onOpenChange: () => void;
   onClose: () => void;
+  selectedBook?: SelectedBookItem;
 }
 
 export default function AddBookModal({
   isOpen,
-  onOpenChange,
   onClose,
+  selectedBook,
 }: AddBookModalProps) {
   const {
     register,
@@ -39,7 +40,12 @@ export default function AddBookModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal
+      size="2xl"
+      backdrop="blur"
+      isOpen={isOpen}
+      onOpenChange={handleClose}
+    >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">Add Book</ModalHeader>
         <ModalBody>
@@ -49,6 +55,8 @@ export default function AddBookModal({
                 {...register("title", { required: true })}
                 label="Title"
                 variant="bordered"
+                defaultValue={selectedBook?.title}
+                isReadOnly={!!selectedBook}
               />
               {errors.title && (
                 <span className="text-red-500">Title is required</span>
@@ -59,6 +67,8 @@ export default function AddBookModal({
                 {...register("author", { required: true })}
                 label="Author"
                 variant="bordered"
+                defaultValue={selectedBook?.author}
+                isReadOnly={!!selectedBook}
               />
               {errors.author && (
                 <span className="text-red-500">Author is required</span>
@@ -69,6 +79,7 @@ export default function AddBookModal({
                 {...register("description", { required: true })}
                 label="Description"
                 variant="bordered"
+                defaultValue={selectedBook?.description}
               />
               {errors.description && (
                 <span className="text-red-500">Description is required</span>
@@ -80,6 +91,7 @@ export default function AddBookModal({
                 type="number"
                 label="Quantity"
                 variant="bordered"
+                defaultValue={selectedBook?.quantity.toString() ?? "0"}
               />
               {errors.quantity && (
                 <span className="text-red-500">Quantity is required</span>
@@ -100,6 +112,8 @@ export default function AddBookModal({
                 {...register("imageLink", { required: true })}
                 label="Image Link"
                 variant="bordered"
+                defaultValue={selectedBook?.imageLink}
+                isReadOnly={!!selectedBook}
               />
               {errors.imageLink && (
                 <span className="text-red-500">Image Link is required</span>
