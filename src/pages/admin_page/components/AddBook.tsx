@@ -8,6 +8,7 @@ export interface SelectedBookItem {
   author: string;
   description: string;
   quantity: number;
+  category: string;
   imageLink: string;
 }
 

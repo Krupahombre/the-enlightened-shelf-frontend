@@ -10,6 +10,8 @@ import {
 } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
 import { SelectedBookItem } from "../components/AddBook";
+import AddBook from "../../../interfaces/book/AddBook";
+import Client from "../../../api/Client";
 
 interface AddBookModalProps {
   isOpen: boolean;
@@ -29,8 +31,17 @@ export default function AddBookModal({
     reset,
   } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    const bookData: AddBook = {
+      title: data.title,
+      author: data.author,
+      description: data.description,
+      quantity: data.quantity,
+      category: data.category,
+      img: data.img,
+    };
+
+    const response = await Client.addBook(bookData);
     handleClose();
   };
 
@@ -87,14 +98,23 @@ export default function AddBookModal({
             </div>
             <div className="mb-2">
               <Input
-                {...register("quantity", { required: true })}
+                {...register("quantity", {
+                  required: true,
+                  validate: {
+                    notZero: (value) => value !== "0" || "Quantity cannot be 0",
+                  },
+                })}
                 type="number"
                 label="Quantity"
                 variant="bordered"
                 defaultValue={selectedBook?.quantity.toString() ?? "0"}
               />
               {errors.quantity && (
-                <span className="text-red-500">Quantity is required</span>
+                <span className="text-red-500">
+                  {errors.quantity.type === "notZero"
+                    ? "Quantity cannot be 0"
+                    : "Quantity is required"}
+                </span>
               )}
             </div>
             <div className="mb-2">
@@ -102,6 +122,7 @@ export default function AddBookModal({
                 {...register("category", { required: true })}
                 label="Category"
                 variant="bordered"
+                defaultValue={selectedBook?.category ?? ""}
               />
               {errors.category && (
                 <span className="text-red-500">Category is required</span>
@@ -109,7 +130,7 @@ export default function AddBookModal({
             </div>
             <div className="mb-2">
               <Input
-                {...register("imageLink", { required: true })}
+                {...register("img", { required: true })}
                 label="Image Link"
                 variant="bordered"
                 defaultValue={selectedBook?.imageLink}

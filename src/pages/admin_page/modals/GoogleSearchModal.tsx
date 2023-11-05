@@ -22,6 +22,7 @@ export interface GoogleBooksVolumeInfo {
   description: string;
   title: string;
   authors: string[];
+  categories: string[];
   imageLinks: {
     smallThumbnail: string;
   };
@@ -54,10 +55,11 @@ const GoogleSearchModal: React.FC<GoogleSearchModalProps> = ({
 
   const handleAddRequest = (book: GoogleBooksItem) => {
     const selectedBook: SelectedBookItem = {
-      author: book.volumeInfo.authors[0],
+      author: book.volumeInfo.authors?.[0] ?? "",
       title: book.volumeInfo.title,
       description: book.volumeInfo.description ?? "",
       quantity: 0,
+      category: book.volumeInfo.categories?.[0] ?? "",
       imageLink: book.volumeInfo.imageLinks.smallThumbnail,
     };
 
