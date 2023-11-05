@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # File with api keys
-hidden.env
+.env.local

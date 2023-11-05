@@ -7,11 +7,13 @@ import AddBook from "../interfaces/book/AddBook";
 import BookResponse from "../interfaces/book/BookResponse";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+const GOOGLE_API_URL = import.meta.env.VITE_GOOGLE_API_URL;
 
 axios.interceptors.request.use((setup) => {
   const token = localStorage.getItem("token");
 
-  if (token) {
+  if (token && setup.url?.indexOf("googleapis") === -1) {
     setup.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -31,6 +33,12 @@ const Client = {
     axios
       .post<ResponseWrapper<BookResponse>>(`/books/`, addBook)
       .then((response) => response.data),
+  searchGoogleApi: (searchTerm: string, maxResults: number = 15) =>
+    axios
+      .get(
+        `${GOOGLE_API_URL}/volumes?q=${searchTerm}&key=${GOOGLE_API_KEY}&maxResults=${maxResults}`
+      )
+      .then((response) => response),
 };
 
 export default Client;

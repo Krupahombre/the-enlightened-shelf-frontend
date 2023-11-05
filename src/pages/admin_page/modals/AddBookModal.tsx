@@ -9,17 +9,20 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
+import { SelectedBookItem } from "../components/AddBook";
+import AddBook from "../../../interfaces/book/AddBook";
+import Client from "../../../api/Client";
 
 interface AddBookModalProps {
   isOpen: boolean;
-  onOpenChange: () => void;
   onClose: () => void;
+  selectedBook?: SelectedBookItem;
 }
 
 export default function AddBookModal({
   isOpen,
-  onOpenChange,
   onClose,
+  selectedBook,
 }: AddBookModalProps) {
   const {
     register,
@@ -28,8 +31,17 @@ export default function AddBookModal({
     reset,
   } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    const bookData: AddBook = {
+      title: data.title,
+      author: data.author,
+      description: data.description,
+      quantity: data.quantity,
+      category: data.category,
+      img: data.img,
+    };
+
+    const response = await Client.addBook(bookData);
     handleClose();
   };
 
@@ -39,7 +51,12 @@ export default function AddBookModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal
+      size="2xl"
+      backdrop="blur"
+      isOpen={isOpen}
+      onOpenChange={handleClose}
+    >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">Add Book</ModalHeader>
         <ModalBody>
@@ -49,6 +66,8 @@ export default function AddBookModal({
                 {...register("title", { required: true })}
                 label="Title"
                 variant="bordered"
+                defaultValue={selectedBook?.title}
+                isReadOnly={!!selectedBook}
               />
               {errors.title && (
                 <span className="text-red-500">Title is required</span>
@@ -59,6 +78,8 @@ export default function AddBookModal({
                 {...register("author", { required: true })}
                 label="Author"
                 variant="bordered"
+                defaultValue={selectedBook?.author}
+                isReadOnly={!!selectedBook}
               />
               {errors.author && (
                 <span className="text-red-500">Author is required</span>
@@ -69,6 +90,7 @@ export default function AddBookModal({
                 {...register("description", { required: true })}
                 label="Description"
                 variant="bordered"
+                defaultValue={selectedBook?.description}
               />
               {errors.description && (
                 <span className="text-red-500">Description is required</span>
@@ -76,13 +98,23 @@ export default function AddBookModal({
             </div>
             <div className="mb-2">
               <Input
-                {...register("quantity", { required: true })}
+                {...register("quantity", {
+                  required: true,
+                  validate: {
+                    notZero: (value) => value !== "0" || "Quantity cannot be 0",
+                  },
+                })}
                 type="number"
                 label="Quantity"
                 variant="bordered"
+                defaultValue={selectedBook?.quantity.toString() ?? "0"}
               />
               {errors.quantity && (
-                <span className="text-red-500">Quantity is required</span>
+                <span className="text-red-500">
+                  {errors.quantity.type === "notZero"
+                    ? "Quantity cannot be 0"
+                    : "Quantity is required"}
+                </span>
               )}
             </div>
             <div className="mb-2">
@@ -90,6 +122,7 @@ export default function AddBookModal({
                 {...register("category", { required: true })}
                 label="Category"
                 variant="bordered"
+                defaultValue={selectedBook?.category ?? ""}
               />
               {errors.category && (
                 <span className="text-red-500">Category is required</span>
@@ -97,9 +130,11 @@ export default function AddBookModal({
             </div>
             <div className="mb-2">
               <Input
-                {...register("imageLink", { required: true })}
+                {...register("img", { required: true })}
                 label="Image Link"
                 variant="bordered"
+                defaultValue={selectedBook?.imageLink}
+                isReadOnly={!!selectedBook}
               />
               {errors.imageLink && (
                 <span className="text-red-500">Image Link is required</span>
