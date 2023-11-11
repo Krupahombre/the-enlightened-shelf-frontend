@@ -34,7 +34,7 @@ export default function AdminPage() {
             variant={manageBookClick ? "bordered" : "light"}
             onClick={changeQuantityOfBooksClickFunction}
           >
-            Change quantity
+            Manage books
           </Button>
         </ButtonGroup>
       </nav>

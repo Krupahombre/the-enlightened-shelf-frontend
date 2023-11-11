@@ -41,7 +41,7 @@ export default function AddBookModal({
       img: data.img,
     };
 
-    const response = await Client.addBook(bookData);
+    await Client.addBook(bookData);
     handleClose();
   };
 
