@@ -33,6 +33,10 @@ const Client = {
     axios
       .post<ResponseWrapper<BookResponse>>(`/books/`, addBook)
       .then((response) => response.data),
+  getBooks: () =>
+    axios
+      .get<ResponseWrapper<BookResponse[]>>(`books/`)
+      .then((response) => response.data),
   searchGoogleApi: (searchTerm: string, maxResults: number = 15) =>
     axios
       .get(

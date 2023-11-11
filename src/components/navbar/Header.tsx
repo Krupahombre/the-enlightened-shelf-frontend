@@ -5,15 +5,18 @@ import {
   NavbarContent,
   NavbarItem,
 } from "@nextui-org/react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useStorage } from "../../storage/Storage";
 import { observer } from "mobx-react-lite";
 
 export default observer(function Header() {
   const { userStorage } = useStorage();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     userStorage.logoutUser();
+
+    navigate("/");
   };
 
   return (
