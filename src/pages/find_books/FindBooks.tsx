@@ -43,7 +43,7 @@ export default function FindBooks() {
     setShowBookList(result);
   };
 
-  const sortBooks = () => {};
+  // const sortBooks = () => {};
 
   return (
     <div className="flex flex-col items-center justify-start py-12 gap-12">
@@ -71,8 +71,9 @@ export default function FindBooks() {
         </Dropdown>
       </div>
       <div className="flex flex-col p-x-8 w-4/5 lg:w-3/5 mx-auto gap-6">
-        {showBookList.map((book) => (
+        {showBookList.map((book, index) => (
           <FindBookItem
+            key={index}
             bookId={book.id}
             imgUrl={book.img}
             title={book.title}

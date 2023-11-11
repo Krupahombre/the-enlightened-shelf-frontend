@@ -6,6 +6,7 @@ import Register from "./register/Register";
 import FindBooks from "./find_books/FindBooks";
 import AdminPage from "./admin_page/AdminPage";
 import YourShelf from "./your_shelf/YourShelf";
+import BookPage from "./book_page/BookPage";
 
 const Router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const Router = createBrowserRouter([
       {
         path: "/find-books",
         element: <FindBooks />,
+      },
+      {
+        path: "/book-page/:bookId",
+        element: <BookPage />,
       },
       {
         path: "/admin-page",

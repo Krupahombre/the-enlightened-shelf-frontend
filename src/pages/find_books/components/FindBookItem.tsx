@@ -1,4 +1,5 @@
 import { Button, ScrollShadow } from "@nextui-org/react";
+import { Link } from "react-router-dom";
 
 interface FindBookItemProps {
   bookId: number;
@@ -27,7 +28,9 @@ export default function FindBookItem({
         </ScrollShadow>
         <div className="h-full"></div>
         <div className="flex justify-end">
-          <Button>Sraka</Button>
+          <Button as={Link} to={`/book-page/${bookId}`}>
+            More details
+          </Button>
         </div>
       </div>
     </div>
