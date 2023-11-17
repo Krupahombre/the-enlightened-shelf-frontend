@@ -20,7 +20,7 @@ export default function ManageBook() {
   }, []);
 
   return (
-    <div className="flex flex-col p-x-8 w-4/5 lg:w-3/5 mx-auto gap-6">
+    <div className="flex flex-col p-x-8 w-4/5 lg:w-4/5 mx-auto gap-6">
       {bookList.map((book, index) => (
         <ManageBookItem
           key={index}
