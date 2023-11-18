@@ -49,7 +49,7 @@ const GoogleSearchModal: React.FC<GoogleSearchModalProps> = ({
   const searchBook = async () => {
     const response = await Client.searchGoogleApi(searchTerm);
 
-    console.log(response.data.items);
+    // console.log(response.data.items);
     setSearchResults(response.data.items as GoogleBooksItem[]);
   };
 

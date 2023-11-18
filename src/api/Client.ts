@@ -5,6 +5,7 @@ import AuthResponse from "../interfaces/auth/AuthResponse";
 import ResponseWrapper from "../interfaces/ResponseWrapper";
 import AddBook from "../interfaces/book/AddBook";
 import BookResponse from "../interfaces/book/BookResponse";
+import BookUpdate from "../interfaces/book/BookUpdate";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -40,6 +41,14 @@ const Client = {
   getBook: (bookId: number) =>
     axios
       .get<ResponseWrapper<BookResponse>>(`books/book/${bookId}`)
+      .then((response) => response.data),
+  deleteBook: (bookId: number) =>
+    axios
+      .delete<ResponseWrapper<BookResponse>>(`books/book/${bookId}`)
+      .then((response) => response.data),
+  updateBook: (bookId: number, updateBook: BookUpdate) =>
+    axios
+      .put<ResponseWrapper<BookResponse>>(`books/book/${bookId}`, updateBook)
       .then((response) => response.data),
   searchGoogleApi: (searchTerm: string, maxResults: number = 15) =>
     axios

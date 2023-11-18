@@ -21,7 +21,7 @@ export default observer(function Header() {
 
   return (
     <>
-      <Navbar position="static" isBordered>
+      <Navbar shouldHideOnScroll isBordered>
         <NavbarBrand>
           <p className="font-bold text-inherit">THE ENLIGHTENED SHELF</p>
         </NavbarBrand>

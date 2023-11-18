@@ -8,7 +8,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { useForm } from "react-hook-form";
+import { useRef, useState } from "react";
 
 interface ManageBookItemProps {
   bookId: number;
@@ -18,6 +18,12 @@ interface ManageBookItemProps {
   description: string;
   quantity: number;
   quantity_available: number;
+  onDelete: (bookId: number) => void;
+  onChange: (
+    bookId: number,
+    newQuantityNumber: number,
+    newQuantityAvailableNumber: number
+  ) => void;
 }
 
 export default function ManageBookItem({
@@ -28,13 +34,12 @@ export default function ManageBookItem({
   author,
   quantity,
   quantity_available,
+  onDelete,
+  onChange,
 }: ManageBookItemProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm();
+  const inputQuantityRef = useRef<HTMLInputElement>(null);
+  const [isValid, setIsValid] = useState(true);
+  const [isQUantityValid, setIsQuantityValid] = useState(true);
 
   const {
     isOpen: isChangeQuantityModalOpen,
@@ -48,9 +53,62 @@ export default function ManageBookItem({
     onOpenChange: onDeleteBookModalOpenChange,
   } = useDisclosure();
 
-  const onSubmit = (data: any) => {
-    console.log("Submitted Quantity:", data.quantity);
-    // Tutaj możesz dodać logikę do zapisania wartości, np. do serwera itp.
+  const onSubmitQuantity = (
+    e: React.FormEvent<HTMLFormElement>,
+    onClose: any
+  ) => {
+    e.preventDefault();
+    if (!inputQuantityRef.current) {
+      return;
+    }
+    if (
+      isNaN(parseInt(inputQuantityRef.current?.value)) ||
+      parseInt(inputQuantityRef.current?.value) <= 0
+    ) {
+      setIsValid(false);
+      return;
+    }
+    const newQuantity = parseInt(inputQuantityRef.current?.value);
+    console.log("Submitted Quantity:", newQuantity);
+
+    let newOverallQUantity: number;
+    let newOverallAvailableQuantity: number;
+
+    if (quantity === quantity_available) {
+      newOverallQUantity = newQuantity;
+      newOverallAvailableQuantity = newQuantity;
+    } else {
+      const quantityDifference = quantity - newQuantity;
+
+      if (
+        quantityDifference > 0 &&
+        quantity_available - quantityDifference < 0
+      ) {
+        setIsQuantityValid(false);
+        return;
+      } else if (
+        quantityDifference > 0 &&
+        quantity_available - quantityDifference >= 0
+      ) {
+        newOverallQUantity = newQuantity;
+        newOverallAvailableQuantity = quantity_available - quantityDifference;
+      } else if (quantityDifference < 0) {
+        newOverallQUantity = newQuantity;
+        newOverallAvailableQuantity =
+          quantity_available + Math.abs(quantityDifference);
+      }
+    }
+
+    setIsValid(true);
+    setIsQuantityValid(true);
+    onChange(bookId, newOverallQUantity, newOverallAvailableQuantity);
+    onClose();
+  };
+
+  const onSubmitDelete = async (data: any) => {
+    console.log("Book to delete:", data.bookId);
+
+    onDelete(bookId);
   };
 
   return (
@@ -66,7 +124,11 @@ export default function ManageBookItem({
         </ScrollShadow> */}
         <div className="h-full"></div>
         <div className="flex justify-end space-x-2">
-          <Button color="warning" onPress={onChangeQuantityModalOpen}>
+          <Button
+            color="warning"
+            variant="ghost"
+            onPress={onChangeQuantityModalOpen}
+          >
             Change Quantity
           </Button>
           <Button
@@ -79,21 +141,27 @@ export default function ManageBookItem({
           <Modal
             isOpen={isChangeQuantityModalOpen}
             onOpenChange={onChangeQuantityModalOpenChange}
+            backdrop="blur"
           >
             <ModalContent>
               {(onClose) => (
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={(e) => onSubmitQuantity(e, onClose)}>
                   <ModalHeader className="flex flex-col gap-1">
                     Change Quantity
                   </ModalHeader>
                   <ModalBody>
                     <Input
-                      {...register("quantity", {
-                        required: true,
-                      })}
+                      ref={inputQuantityRef}
                       label="New Quantity"
                       variant="bordered"
-                      defaultValue={quantity.toString()}
+                      isInvalid={!isValid || !isQUantityValid}
+                      errorMessage={
+                        (!isValid &&
+                          "Please enter a valid number greater than 0!") ||
+                        (!isQUantityValid &&
+                          "Not enough books to change quantity - books available:  " +
+                            quantity_available)
+                      }
                     />
                   </ModalBody>
                   <ModalFooter>
@@ -102,19 +170,11 @@ export default function ManageBookItem({
                       variant="light"
                       onPress={() => {
                         onClose();
-                        reset(); // Wywołanie reset po zamknięciu modala
                       }}
                     >
                       Close
                     </Button>
-                    <Button
-                      type="submit"
-                      color="primary"
-                      onPress={() => {
-                        onClose();
-                        reset(); // Wywołanie reset po zamknięciu modala
-                      }}
-                    >
+                    <Button type="submit" color="success">
                       Save Changes
                     </Button>
                   </ModalFooter>
@@ -126,6 +186,7 @@ export default function ManageBookItem({
           <Modal
             isOpen={isDeleteBookModalOpen}
             onOpenChange={onDeleteBookModalOpenChange}
+            backdrop="blur"
           >
             <ModalContent>
               {(onClose) => (
@@ -141,10 +202,22 @@ export default function ManageBookItem({
                     </div>
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
+                    <Button
+                      color="danger"
+                      variant="light"
+                      onPress={() => {
+                        onClose();
+                      }}
+                    >
                       Close
                     </Button>
-                    <Button color="danger" onPress={onClose}>
+                    <Button
+                      color="danger"
+                      onPress={() => {
+                        onSubmitDelete({ bookId });
+                        onClose();
+                      }}
+                    >
                       Confirm Delete
                     </Button>
                   </ModalFooter>
