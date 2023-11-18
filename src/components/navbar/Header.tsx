@@ -4,12 +4,14 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
+  User,
 } from "@nextui-org/react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useStorage } from "../../storage/Storage";
 import { observer } from "mobx-react-lite";
 
 export default observer(function Header() {
+  const username = localStorage.getItem("username") || "";
   const { userStorage } = useStorage();
   const navigate = useNavigate();
 
@@ -64,8 +66,14 @@ export default observer(function Header() {
               </NavbarItem>
             </>
           ) : (
-            <NavbarItem className="hidden lg:flex">
-              <Button color="primary" onClick={handleLogout} variant="flat">
+            <NavbarItem className="hidden lg:flex space-x-3">
+              <User
+                name={"Hello, " + username}
+                avatarProps={{
+                  src: "src/assets/default-user.jpg",
+                }}
+              />
+              <Button color="default" onClick={handleLogout} variant="ghost">
                 Logout
               </Button>
             </NavbarItem>
