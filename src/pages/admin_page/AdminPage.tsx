@@ -3,14 +3,14 @@ import AddBook from "./components/AddBook";
 import ManageBook from "./components/ManageBook";
 import { Button, ButtonGroup, Divider } from "@nextui-org/react";
 import Checkouts from "./components/Checkouts";
-import Constants from "../../utils/Constants";
 import { Navigate } from "react-router-dom";
+import UserStorage from "../../storage/UserStorage";
 
 export default function AdminPage() {
   const [manageBookClick, setManageBookClick] = useState(true);
   const [addBookClick, setAddBookClick] = useState(false);
   const [checkoutsClick, setCheckoutsClick] = useState(false);
-  const userRole = localStorage.getItem("role");
+  const storage = new UserStorage();
 
   function addBookClickFunction() {
     setManageBookClick(false);
@@ -30,7 +30,7 @@ export default function AdminPage() {
     setCheckoutsClick(true);
   }
 
-  if (userRole !== Constants.Roles.Admin) {
+  if (!storage.isAdmin()) {
     return <Navigate to="/login" replace />;
   }
 

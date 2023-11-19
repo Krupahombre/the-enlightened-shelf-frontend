@@ -61,6 +61,10 @@ const Client = {
     axios
       .get<ResponseWrapper<CheckoutResponse[]>>(`checkouts/`)
       .then((response) => response.data),
+  getCheckoutsUser: () =>
+    axios
+      .get<ResponseWrapper<CheckoutResponse[]>>(`checkouts/user`)
+      .then((response) => response.data),
 };
 
 export default Client;
