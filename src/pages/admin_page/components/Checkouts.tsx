@@ -37,6 +37,7 @@ export default function Checkouts() {
   return (
     <Table isStriped aria-label="Checkout table">
       <TableHeader>
+        <TableColumn>ID</TableColumn>
         <TableColumn>EMAIL</TableColumn>
         <TableColumn>BOOK</TableColumn>
         <TableColumn>CHECKOUT DATE</TableColumn>
@@ -44,8 +45,9 @@ export default function Checkouts() {
         <TableColumn>CHECKOUT CODE</TableColumn>
       </TableHeader>
       <TableBody>
-        {checkoutList.map((checkout) => (
+        {checkoutList.map((checkout, index) => (
           <TableRow key={checkout.id}>
+            <TableCell>{index + 1}</TableCell>
             <TableCell>{checkout.user_email}</TableCell>
             <TableCell>{checkout.book_name}</TableCell>
             <TableCell>{checkout.checkout_date.replace("T", " ")}</TableCell>

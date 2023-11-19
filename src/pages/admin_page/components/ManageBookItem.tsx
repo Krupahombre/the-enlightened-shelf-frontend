@@ -159,8 +159,9 @@ export default function ManageBookItem({
                         (!isValid &&
                           "Please enter a valid number greater than 0!") ||
                         (!isQUantityValid &&
-                          "Not enough books to change quantity - books available:  " +
-                            quantity_available)
+                          "Cannot set quantity to less than currently is loaned (" +
+                            (quantity - quantity_available) +
+                            ")")
                       }
                     />
                   </ModalBody>
@@ -169,6 +170,8 @@ export default function ManageBookItem({
                       color="danger"
                       variant="light"
                       onPress={() => {
+                        setIsValid(true);
+                        setIsQuantityValid(true);
                         onClose();
                       }}
                     >
@@ -206,6 +209,8 @@ export default function ManageBookItem({
                       color="danger"
                       variant="light"
                       onPress={() => {
+                        setIsValid(true);
+                        setIsQuantityValid(true);
                         onClose();
                       }}
                     >
