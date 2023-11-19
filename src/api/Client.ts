@@ -6,6 +6,7 @@ import ResponseWrapper from "../interfaces/ResponseWrapper";
 import AddBook from "../interfaces/book/AddBook";
 import BookResponse from "../interfaces/book/BookResponse";
 import BookUpdate from "../interfaces/book/BookUpdate";
+import CheckoutResponse from "../interfaces/checkout/CheckoutResponse";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -56,6 +57,10 @@ const Client = {
         `${GOOGLE_API_URL}/volumes?q=${searchTerm}&key=${GOOGLE_API_KEY}&maxResults=${maxResults}`
       )
       .then((response) => response),
+  getCheckouts: () =>
+    axios
+      .get<ResponseWrapper<CheckoutResponse[]>>(`checkouts/`)
+      .then((response) => response.data),
 };
 
 export default Client;
