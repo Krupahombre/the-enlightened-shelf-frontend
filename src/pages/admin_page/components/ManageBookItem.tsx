@@ -117,8 +117,8 @@ export default function ManageBookItem({
       <div className="flex flex-col pl-6 w-full">
         <h1 className="text-xl font-bold">{title}</h1>
         <h3 className="text-lg">{author}</h3>
-        <p className="mt-7">Book available: {quantity_available}</p>
-        <p className="">Total book quantity: {quantity}</p>
+        <p className="mt-7">Books available: {quantity_available}</p>
+        <p className="">Total books quantity: {quantity}</p>
         {/* <ScrollShadow hideScrollBar className="h-80 overflow-y-scroll">
           <p>{description}</p>
         </ScrollShadow> */}

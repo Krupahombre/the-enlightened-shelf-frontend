@@ -20,8 +20,17 @@ export default function BookPage() {
   const { bookId } = useParams();
   const [book, setBook] = useState<BookResponse>();
   const storage = new UserStorage();
-
   const parsedBookId = bookId ? parseInt(bookId) : undefined;
+
+  const handleBookCheckout = async () => {
+    try {
+      const idOfBook = book?.id || 0;
+      await Client.createCheckout(idOfBook);
+      window.location.reload();
+    } catch (error) {
+      console.error("An error occurred while checking out the book:", error);
+    }
+  };
 
   const fetch = async () => {
     try {
@@ -31,7 +40,7 @@ export default function BookPage() {
         console.log(response.data);
       }
     } catch (error) {
-      console.error("An error occurred while fetching books:", error);
+      console.error("An error occurred while fetching book:", error);
     }
   };
 
@@ -90,6 +99,7 @@ export default function BookPage() {
                   <Button
                     radius="full"
                     color={isAvailable ? "success" : "danger"}
+                    onClick={handleBookCheckout}
                   >
                     {isAvailable ? "Check this book out" : "Out of stock"}
                   </Button>

@@ -38,11 +38,13 @@ export default observer(function Header() {
               Find Books
             </Link>
           </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" to="/your-shelf">
-              Your Shelf
-            </Link>
-          </NavbarItem>
+          {userStorage.isLoggedIn() && (
+            <NavbarItem>
+              <Link color="foreground" to="/your-shelf">
+                Your Shelf
+              </Link>
+            </NavbarItem>
+          )}
           {userStorage.isAdmin() && (
             <NavbarItem>
               <Link color="foreground" to="/admin-page">

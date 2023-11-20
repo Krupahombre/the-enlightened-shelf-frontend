@@ -54,7 +54,7 @@ export default function YourShelf() {
   }
 
   return (
-    <div className="flex flex-col items-center pt-5 gap-12 mx-auto w-4/5">
+    <div className="flex flex-col items-center pt-12 gap-12 mx-auto w-4/5">
       <div className="flex flex-col items-center gap-2">
         <h3 className="text-2xl font-bold">
           This page is Your own Shelf in our library!
@@ -82,7 +82,7 @@ export default function YourShelf() {
               <TableCell>{checkout.return_date.replace("T", " ")}</TableCell>
               <TableCell>{calculateTimeLeft(checkout.return_date)}</TableCell>
               <TableCell>
-                <Button>Increase Loan Period</Button>
+                <Button>Extend Loan Period</Button>
               </TableCell>
             </TableRow>
           ))}
