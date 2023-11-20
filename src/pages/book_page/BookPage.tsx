@@ -1,12 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import BookResponse from "../../interfaces/book/BookResponse";
 import Client from "../../api/Client";
-import { Image } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Chip,
+  Divider,
+  Image,
+  Tooltip,
+} from "@nextui-org/react";
+import UserStorage from "../../storage/UserStorage";
+import { BsInfoCircle } from "react-icons/bs";
 
 export default function BookPage() {
   const { bookId } = useParams();
   const [book, setBook] = useState<BookResponse>();
+  const storage = new UserStorage();
 
   const parsedBookId = bookId ? parseInt(bookId) : undefined;
 
@@ -26,15 +39,80 @@ export default function BookPage() {
     fetch().catch(console.error);
   }, []);
 
+  if (!storage.isLoggedIn()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const isAvailable = book?.quantity_available && book?.quantity_available > 0;
+  const availabilityText = isAvailable ? "Available" : "Unavailable";
+  const availabilityInfo = isAvailable
+    ? "Feel free to check this book out! 😃"
+    : "Try again later 🙁";
+  const textColorClass = isAvailable ? "text-green-500" : "text-red-500";
+
   return (
     <div className="flex flex-col w-4/5 mx-auto pt-5 gap-10">
       <div>
         <h3 className="text-2xl font-bold">{book?.title}</h3>
         <h1 className="font-bold">{book?.author}</h1>
       </div>
-      <div className="flex flex-row w-4/5 mx-auto gap-6">
-        <Image width={200} alt="Book Image" src={book?.img} />
-        <p className="h-80">{book?.description}</p>
+      <div className="flex flex-row gap-6">
+        <div className="flex flex-col items-center w-1/5">
+          <Image isBlurred width={200} alt="Book Image" src={book?.img} />
+        </div>
+        <div className="flex flex-col gap-5 w-1/2">
+          <div className="flex flex-row">
+            <Chip color="warning" variant="dot">
+              {book?.category}
+            </Chip>
+          </div>
+          <h1 className="font-bold">Description:</h1>
+          <p>{book?.description}</p>
+        </div>
+        <div className="w-1/4">
+          <Card>
+            <CardHeader className="flex flex-row gap-3 text-xl font-bold">
+              <h2 className={textColorClass}>{availabilityText}</h2>
+              <Tooltip showArrow={true} content={availabilityInfo}>
+                <p>
+                  <BsInfoCircle />
+                </p>
+              </Tooltip>
+            </CardHeader>
+            <Divider />
+            <CardBody>
+              <div className="flex flex-col gap-1">
+                <p>Book copies: {book?.quantity}</p>
+                <p>Available: {book?.quantity_available}</p>
+              </div>
+              <div className="flex flex-col items-center pt-5">
+                {isAvailable ? (
+                  <Button
+                    radius="full"
+                    color={isAvailable ? "success" : "danger"}
+                  >
+                    {isAvailable ? "Check this book out" : "Out of stock"}
+                  </Button>
+                ) : (
+                  <Button
+                    radius="full"
+                    color={isAvailable ? "success" : "danger"}
+                    isDisabled
+                  >
+                    {isAvailable ? "Check this book out" : "Out of stock"}
+                  </Button>
+                )}
+              </div>
+            </CardBody>
+            <Divider />
+            <CardFooter className="flex flex-col text-gray-500 text-sm">
+              <p>
+                Please note that the current quantity of available copies may
+                change during the checkout process.
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </div>
   );
