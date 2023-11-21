@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import BookResponse from "../../interfaces/book/BookResponse";
 import Client from "../../api/Client";
 import {
@@ -15,10 +15,13 @@ import {
 } from "@nextui-org/react";
 import UserStorage from "../../storage/UserStorage";
 import { BsInfoCircle } from "react-icons/bs";
+import Review from "./components/Review";
+import ReviewResponse from "../../interfaces/review/ReviewResponse";
 
 export default function BookPage() {
   const { bookId } = useParams();
   const [book, setBook] = useState<BookResponse>();
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const storage = new UserStorage();
   const parsedBookId = bookId ? parseInt(bookId) : undefined;
 
@@ -35,12 +38,13 @@ export default function BookPage() {
   const fetch = async () => {
     try {
       if (parsedBookId !== undefined) {
-        const response = await Client.getBook(parsedBookId);
-        setBook(response.data);
-        console.log(response.data);
+        const bookResponse = await Client.getBook(parsedBookId);
+        setBook(bookResponse.data);
+        const reviewResponse = await Client.getReviews(parsedBookId);
+        setReviews(reviewResponse.data);
       }
     } catch (error) {
-      console.error("An error occurred while fetching book:", error);
+      console.error("An error occurred while fetching book data:", error);
     }
   };
 
@@ -52,6 +56,16 @@ export default function BookPage() {
     return <Navigate to="/login" replace />;
   }
 
+  const calculateAverageRating = () => {
+    if (reviews.length === 0) {
+      return 0;
+    }
+
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / reviews.length;
+    return averageRating.toFixed(2);
+  };
+
   const isAvailable = book?.quantity_available && book?.quantity_available > 0;
   const availabilityText = isAvailable ? "Available" : "Unavailable";
   const availabilityInfo = isAvailable
@@ -62,7 +76,12 @@ export default function BookPage() {
   return (
     <div className="flex flex-col w-4/5 mx-auto pt-5 gap-10">
       <div>
-        <h3 className="text-2xl font-bold">{book?.title}</h3>
+        <div className="flex justify-between">
+          <h3 className="text-2xl font-bold">{book?.title}</h3>
+          <p className="text-2xl font-bold">
+            Rating: {calculateAverageRating()}/5
+          </p>
+        </div>
         <h1 className="font-bold">{book?.author}</h1>
       </div>
       <div className="flex flex-row gap-6">
@@ -123,6 +142,25 @@ export default function BookPage() {
             </CardFooter>
           </Card>
         </div>
+      </div>
+      <Divider />
+      <div className="flex flex-col gap-4 pb-5">
+        <p className="text-xl font-bold">Latest reviews:</p>
+        {reviews.length === 0 ? (
+          <div className="flex justify-center">
+            <p>No reviews yet! 🤔</p>
+          </div>
+        ) : (
+          reviews.map((review, index) => (
+            <Review
+              key={index}
+              username={review.username}
+              date={review.date}
+              rating={review.rating}
+              comment={review.comment}
+            />
+          ))
+        )}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import { useStorage } from "../../storage/Storage";
 import { observer } from "mobx-react-lite";
 
 export default observer(function Header() {
+  const userImage = "src/assets/default-user.jpg";
   const username = localStorage.getItem("username") || "";
   const { userStorage } = useStorage();
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ export default observer(function Header() {
               <User
                 name={"Hello, " + username}
                 avatarProps={{
-                  src: "src/assets/default-user.jpg",
+                  src: userImage,
                 }}
               />
               <Button color="default" onClick={handleLogout} variant="ghost">
