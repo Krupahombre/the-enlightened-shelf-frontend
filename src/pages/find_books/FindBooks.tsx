@@ -52,7 +52,7 @@ export default function FindBooks() {
       </h3>
       <div className="flex flex-row items-center justify-start gap-4">
         <Input
-          label="Username"
+          label="Search ..."
           variant="bordered"
           // endContent={
           //   <button className="focus:outline-none p-3" type="button"></button>

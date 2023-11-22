@@ -7,6 +7,8 @@ import AddBook from "../interfaces/book/AddBook";
 import BookResponse from "../interfaces/book/BookResponse";
 import BookUpdate from "../interfaces/book/BookUpdate";
 import CheckoutResponse from "../interfaces/checkout/CheckoutResponse";
+import ReviewResponse from "../interfaces/review/ReviewResponse";
+import AddReview from "../interfaces/review/AddReview";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -60,6 +62,22 @@ const Client = {
   getCheckouts: () =>
     axios
       .get<ResponseWrapper<CheckoutResponse[]>>(`checkouts/`)
+      .then((response) => response.data),
+  getCheckoutsUser: () =>
+    axios
+      .get<ResponseWrapper<CheckoutResponse[]>>(`checkouts/user`)
+      .then((response) => response.data),
+  createCheckout: (bookId: number) =>
+    axios
+      .post<ResponseWrapper<CheckoutResponse>>(`checkouts/book/${bookId}`)
+      .then((response) => response.data),
+  getReviews: (bookId: number) =>
+    axios
+      .get<ResponseWrapper<ReviewResponse[]>>(`reviews/${bookId}`)
+      .then((response) => response.data),
+  addReview: (bookId: number, addReview: AddReview) =>
+    axios
+      .post<ResponseWrapper<ReviewResponse>>(`reviews/${bookId}`, addReview)
       .then((response) => response.data),
 };
 
