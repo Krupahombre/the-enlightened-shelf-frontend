@@ -3,10 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SignUp from "../../interfaces/register/SignUp";
 import Client from "../../api/Client";
+import UserStorage from "../../storage/UserStorage";
+import { useStorage } from "../../storage/Storage";
 
 export default function Register() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
+  const { userStorage } = useStorage();
 
   const onSubmit = async (data: any) => {
     const registerData: SignUp = {
@@ -17,11 +20,11 @@ export default function Register() {
       password: data.password,
     };
 
+    console.log(registerData);
+
     const response = await Client.register(registerData);
 
-    localStorage.setItem("username", response.data.username);
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("role", response.data.role);
+    userStorage.setUser(response.data);
 
     navigate("/");
   };

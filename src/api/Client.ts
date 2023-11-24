@@ -1,6 +1,5 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Auth from "../interfaces/auth/Auth";
-import Register from "../interfaces/register/SignUp";
 import AuthResponse from "../interfaces/auth/AuthResponse";
 import ResponseWrapper from "../interfaces/ResponseWrapper";
 import AddBook from "../interfaces/book/AddBook";
@@ -9,6 +8,9 @@ import BookUpdate from "../interfaces/book/BookUpdate";
 import CheckoutResponse from "../interfaces/checkout/CheckoutResponse";
 import ReviewResponse from "../interfaces/review/ReviewResponse";
 import AddReview from "../interfaces/review/AddReview";
+import SignUp from "../interfaces/register/SignUp";
+import Router from "../pages/Router";
+import toast from "react-hot-toast";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -24,12 +26,65 @@ axios.interceptors.request.use((setup) => {
   return setup;
 });
 
+axios.interceptors.response.use(
+  (response) => {
+    // toast.success("Success!");
+    return response;
+  },
+  (error: AxiosError) => {
+    if (error.response) {
+      const { status, data } = error.response;
+
+      switch (status) {
+        case 400: {
+          toast.error("Bad request", {
+            icon: "❌",
+          });
+          break;
+        }
+
+        case 403: {
+          toast.error("Only for admins!", {
+            icon: "🤬",
+          });
+          Router.navigate("/");
+          break;
+        }
+
+        case 401: {
+          break;
+        }
+
+        case 404:
+          toast.error(data.details, {
+            icon: "🚫",
+          });
+          break;
+
+        case 409:
+          break;
+
+        case 422:
+          break;
+
+        case 500:
+          Router.navigate("/server-error");
+          break;
+      }
+    } else if (error.message === "NETWORK_ERROR" && !error.response) {
+      toast.error("Network error - make sure API is running!");
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 const Client = {
   login: (auth: Auth) =>
     axios
       .post<ResponseWrapper<AuthResponse>>(`/auth/login`, auth)
       .then((response) => response.data),
-  register: (register: Register) =>
+  register: (register: SignUp) =>
     axios
       .post<ResponseWrapper<AuthResponse>>(`/auth/register`, register)
       .then((response) => response.data),
@@ -70,6 +125,18 @@ const Client = {
   createCheckout: (bookId: number) =>
     axios
       .post<ResponseWrapper<CheckoutResponse>>(`checkouts/book/${bookId}`)
+      .then((response) => response.data),
+  extendCheckout: (checkout_id: number) =>
+    axios
+      .put<ResponseWrapper<CheckoutResponse>>(
+        `/checkouts/extend-loan/${checkout_id}`
+      )
+      .then((response) => response.data),
+  returnCheckout: (checkout_id: number) =>
+    axios
+      .delete<ResponseWrapper<CheckoutResponse>>(
+        `/checkouts/return/${checkout_id}`
+      )
       .then((response) => response.data),
   getReviews: (bookId: number) =>
     axios

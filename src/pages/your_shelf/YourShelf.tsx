@@ -8,6 +8,10 @@ import {
   TableRow,
   TableCell,
   Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import Client from "../../api/Client";
@@ -23,7 +27,7 @@ export default function YourShelf() {
       const checkouts = await Client.getCheckoutsUser();
       setCheckoutList(checkouts.data);
       setCheckoutsNum(checkouts.data.length);
-      console.log(checkouts.data);
+      // console.log(checkouts.data);
     } catch (error) {
       console.error("An error occurred while fetching checkouts:", error);
     }
@@ -32,6 +36,26 @@ export default function YourShelf() {
   useEffect(() => {
     fetchData().catch(console.error);
   }, []);
+
+  const extendLoanHandler = async (checkoutId: number) => {
+    try {
+      await Client.extendCheckout(checkoutId);
+
+      window.location.reload();
+    } catch (error) {
+      console.error("An error occurred while extending the loan:", error);
+    }
+  };
+
+  const returnBookHandler = async (checkoutId: number) => {
+    try {
+      await Client.returnCheckout(checkoutId);
+
+      window.location.reload();
+    } catch (error) {
+      console.error("An error occurred while returning the book:", error);
+    }
+  };
 
   const calculateTimeLeft = (returnDate: string) => {
     const returnDateTime = new Date(returnDate);
@@ -82,7 +106,27 @@ export default function YourShelf() {
               <TableCell>{checkout.return_date.replace("T", " ")}</TableCell>
               <TableCell>{calculateTimeLeft(checkout.return_date)}</TableCell>
               <TableCell>
-                <Button>Extend Loan Period</Button>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button>Open Menu</Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Static Actions">
+                    <DropdownItem
+                      key="edit"
+                      onClick={() => extendLoanHandler(checkout.id)}
+                    >
+                      Extend Loan Period
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      onClick={() => returnBookHandler(checkout.id)}
+                    >
+                      Return Book
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </TableCell>
             </TableRow>
           ))}

@@ -11,12 +11,22 @@ import {
   Chip,
   Divider,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Textarea,
   Tooltip,
 } from "@nextui-org/react";
 import UserStorage from "../../storage/UserStorage";
 import { BsInfoCircle } from "react-icons/bs";
 import Review from "./components/Review";
 import ReviewResponse from "../../interfaces/review/ReviewResponse";
+import { RatingData } from "./utils/RatingData";
+import AddReview from "../../interfaces/review/AddReview";
 
 export default function BookPage() {
   const { bookId } = useParams();
@@ -24,6 +34,27 @@ export default function BookPage() {
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const storage = new UserStorage();
   const parsedBookId = bookId ? parseInt(bookId) : undefined;
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [addedComment, setAddedComment] = useState("");
+  const [addedRating, setAddedRating] = useState(0.0);
+
+  const handleOpenReviewModal = () => {
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    console.log("Added Comment:", addedComment);
+    console.log("Added Rating:", addedRating);
+
+    const reviewData: AddReview = {
+      rating: addedRating,
+      comment: addedComment,
+    };
+
+    setIsReviewModalOpen(false);
+    setAddedComment("");
+    setAddedRating(0.0);
+  };
 
   const handleBookCheckout = async () => {
     try {
@@ -95,7 +126,7 @@ export default function BookPage() {
             </Chip>
           </div>
           <h1 className="font-bold">Description:</h1>
-          <p>{book?.description}</p>
+          <p className="overflow-y-scroll max-h-[200px]">{book?.description}</p>
         </div>
         <div className="w-1/4">
           <Card>
@@ -145,7 +176,12 @@ export default function BookPage() {
       </div>
       <Divider />
       <div className="flex flex-col gap-4 pb-5">
-        <p className="text-xl font-bold">Latest reviews:</p>
+        <div className="flex flex row justify-between">
+          <p className="text-xl font-bold">Latest reviews:</p>
+          <Button color="warning" onClick={handleOpenReviewModal}>
+            Leave a review
+          </Button>
+        </div>
         {reviews.length === 0 ? (
           <div className="flex justify-center">
             <p>No reviews yet! 🤔</p>
@@ -162,6 +198,52 @@ export default function BookPage() {
           ))
         )}
       </div>
+      <Modal
+        isOpen={isReviewModalOpen}
+        onOpenChange={() => (
+          setIsReviewModalOpen(!isReviewModalOpen),
+          setAddedComment(""),
+          setAddedRating(0.0)
+        )}
+        backdrop="blur"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            Leave a Review
+          </ModalHeader>
+          <ModalBody>
+            <Select label="Select rating">
+              {RatingData.map((rating) => (
+                <SelectItem key={rating.value} value={rating.value}>
+                  {rating.label}
+                </SelectItem>
+              ))}
+            </Select>
+            <Textarea
+              label="Comment"
+              variant="bordered"
+              value={addedComment}
+              onChange={(event) => setAddedComment(event.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="danger"
+              variant="light"
+              onPress={() => {
+                setIsReviewModalOpen(false);
+                setAddedComment("");
+                setAddedRating(0.0);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button color="success" onPress={handleSubmitReview}>
+              Submit review
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
