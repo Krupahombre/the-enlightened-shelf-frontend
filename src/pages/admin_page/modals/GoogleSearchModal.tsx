@@ -95,6 +95,7 @@ const GoogleSearchModal: React.FC<GoogleSearchModalProps> = ({
               );
             }
             return null;
+            // add no results div
           })}
         </ModalBody>
         <ModalFooter>

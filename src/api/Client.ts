@@ -10,7 +10,9 @@ import ReviewResponse from "../interfaces/review/ReviewResponse";
 import AddReview from "../interfaces/review/AddReview";
 import SignUp from "../interfaces/register/SignUp";
 import Router from "../pages/Router";
-import toast from "react-hot-toast";
+import ToastError from "../interfaces/ToastError";
+import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -26,58 +28,57 @@ axios.interceptors.request.use((setup) => {
   return setup;
 });
 
-axios.interceptors.response.use(
-  (response) => {
-    // toast.success("Success!");
-    return response;
-  },
-  (error: AxiosError) => {
-    if (error.response) {
-      const { status, data } = error.response;
+// axios.interceptors.response.use(
+//   (response) => {
+//     // toast.success("Success!");
+//     return response;
+//   },
+//   (error: AxiosError) => {
+//     if (error.response) {
+//       const { status, data } = error.response;
+//       const dataError = data as ToastError;
 
-      switch (status) {
-        case 400: {
-          toast.error("Bad request", {
-            icon: "❌",
-          });
-          break;
-        }
+//       switch (status) {
+//         case 400: {
+//           toast.error("Bad request");
+//           break;
+//         }
 
-        case 403: {
-          toast.error("Only for admins!", {
-            icon: "🤬",
-          });
-          Router.navigate("/");
-          break;
-        }
+//         case 403: {
+//           toast.error("Couldn't authenticate - please log in");
+//           break;
+//         }
 
-        case 401: {
-          break;
-        }
+//         case 401: {
+//           toast.error("Only for admins!");
+//           Router.navigate("/");
+//           break;
+//         }
 
-        case 404:
-          toast.error(data.details, {
-            icon: "🚫",
-          });
-          break;
+//         case 404: {
+//           toast.error(dataError.detail);
+//           break;
+//         }
 
-        case 409:
-          break;
+//         case 409: {
+//           toast.error(dataError.detail);
+//           break;
+//         }
 
-        case 422:
-          break;
+//         case 422:
+//           break;
 
-        case 500:
-          Router.navigate("/server-error");
-          break;
-      }
-    } else if (error.message === "NETWORK_ERROR" && !error.response) {
-      toast.error("Network error - make sure API is running!");
-    }
+//         case 500:
+//           Router.navigate("/server-error");
+//           break;
+//       }
+//     } else if (error.message === "Network Error" && !error.response) {
+//       toast.error("Network error - make sure API is running!");
+//     }
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 
 const Client = {
   login: (auth: Auth) =>

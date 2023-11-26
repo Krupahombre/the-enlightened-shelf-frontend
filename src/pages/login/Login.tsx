@@ -1,14 +1,17 @@
 import { Button, Card, CardBody, Input } from "@nextui-org/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import Client from "../../api/Client";
 import Auth from "../../interfaces/auth/Auth";
 import { useForm } from "react-hook-form";
 import { useStorage } from "../../storage/Storage";
+import UserStorage from "../../storage/UserStorage";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
   const { userStorage } = useStorage();
+  const storage = new UserStorage();
 
   const onSubmit = async (data: any) => {
     const authData: Auth = {
@@ -22,6 +25,11 @@ export default function Login() {
 
     navigate("/");
   };
+
+  if (storage.isLoggedIn()) {
+    toast.info("You are already logged in");
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="flex justify-center items-center h-screen">

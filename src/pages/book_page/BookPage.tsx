@@ -27,6 +27,8 @@ import Review from "./components/Review";
 import ReviewResponse from "../../interfaces/review/ReviewResponse";
 import { RatingData } from "./utils/RatingData";
 import AddReview from "../../interfaces/review/AddReview";
+import Router from "../Router";
+import { toast } from "react-toastify";
 
 export default function BookPage() {
   const { bookId } = useParams();
@@ -43,17 +45,24 @@ export default function BookPage() {
   };
 
   const handleSubmitReview = async () => {
-    console.log("Added Comment:", addedComment);
-    console.log("Added Rating:", addedRating);
+    try {
+      console.log("Added Comment:", addedComment);
+      console.log("Added Rating:", addedRating);
 
-    const reviewData: AddReview = {
-      rating: addedRating,
-      comment: addedComment,
-    };
+      const reviewData: AddReview = {
+        rating: addedRating,
+        comment: addedComment,
+      };
+      const idOfBook = book?.id || 0;
+      await Client.addReview(idOfBook, reviewData);
 
-    setIsReviewModalOpen(false);
-    setAddedComment("");
-    setAddedRating(0.0);
+      setIsReviewModalOpen(false);
+      setAddedComment("");
+      setAddedRating(0.0);
+      window.location.reload();
+    } catch (error) {
+      console.error("An error occurred while adding review:", error);
+    }
   };
 
   const handleBookCheckout = async () => {
@@ -76,6 +85,7 @@ export default function BookPage() {
       }
     } catch (error) {
       console.error("An error occurred while fetching book data:", error);
+      Router.navigate("/find-books");
     }
   };
 
@@ -84,7 +94,8 @@ export default function BookPage() {
   }, []);
 
   if (!storage.isLoggedIn()) {
-    return <Navigate to="/login" replace />;
+    toast.info("Log in to continue");
+    Router.navigate("/login");
   }
 
   const calculateAverageRating = () => {
@@ -212,9 +223,13 @@ export default function BookPage() {
             Leave a Review
           </ModalHeader>
           <ModalBody>
-            <Select label="Select rating">
+            <Select
+              label="Select rating"
+              value={addedRating.toString()}
+              onChange={(e) => setAddedRating(Number(e.target.value))}
+            >
               {RatingData.map((rating) => (
-                <SelectItem key={rating.value} value={rating.value}>
+                <SelectItem key={rating.value} value={rating.value.toString()}>
                   {rating.label}
                 </SelectItem>
               ))}

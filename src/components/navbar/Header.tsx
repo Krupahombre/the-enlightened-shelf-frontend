@@ -6,20 +6,23 @@ import {
   NavbarItem,
   User,
 } from "@nextui-org/react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
 import { useStorage } from "../../storage/Storage";
 import { observer } from "mobx-react-lite";
+import { toast } from "react-toastify";
+import Router from "../../pages/Router";
 
 export default observer(function Header() {
   const userImage = "src/assets/default-user.jpg";
   const username = localStorage.getItem("username") || "";
   const { userStorage } = useStorage();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     userStorage.logoutUser();
 
-    navigate("/");
+    toast.success("Logout successful");
+    // return <Navigate to="/" replace />;
+    Router.navigate("/");
   };
 
   return (
