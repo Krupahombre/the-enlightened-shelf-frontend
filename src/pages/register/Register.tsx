@@ -28,13 +28,14 @@ export default function Register() {
 
     userStorage.setUser(response.data);
 
+    toast.success("Regsister successful");
+
     navigate("/");
   };
 
   if (storage.isLoggedIn()) {
     toast.info("Log out before registration");
     return <Navigate to="/" replace />;
-    // Router.navigate("/")
   }
 
   return (

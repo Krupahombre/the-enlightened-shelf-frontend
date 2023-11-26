@@ -54,9 +54,6 @@ export default function FindBooks() {
         <Input
           label="Search ..."
           variant="bordered"
-          // endContent={
-          //   <button className="focus:outline-none p-3" type="button"></button>
-          // }
           className="max-w-xs"
           onChange={filterBooks}
         />

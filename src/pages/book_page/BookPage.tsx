@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import BookResponse from "../../interfaces/book/BookResponse";
 import Client from "../../api/Client";
 import {
@@ -27,7 +27,6 @@ import Review from "./components/Review";
 import ReviewResponse from "../../interfaces/review/ReviewResponse";
 import { RatingData } from "./utils/RatingData";
 import AddReview from "../../interfaces/review/AddReview";
-import Router from "../Router";
 import { toast } from "react-toastify";
 
 export default function BookPage() {
@@ -39,6 +38,8 @@ export default function BookPage() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [addedComment, setAddedComment] = useState("");
   const [addedRating, setAddedRating] = useState(0.0);
+  const [stateChange, setStateChange] = useState(true);
+  const navigate = useNavigate();
 
   const handleOpenReviewModal = () => {
     setIsReviewModalOpen(true);
@@ -59,7 +60,8 @@ export default function BookPage() {
       setIsReviewModalOpen(false);
       setAddedComment("");
       setAddedRating(0.0);
-      window.location.reload();
+      setStateChange(!stateChange);
+      toast.success("Review submitted!");
     } catch (error) {
       console.error("An error occurred while adding review:", error);
     }
@@ -69,7 +71,8 @@ export default function BookPage() {
     try {
       const idOfBook = book?.id || 0;
       await Client.createCheckout(idOfBook);
-      window.location.reload();
+      setStateChange(!stateChange);
+      toast.success("Checkout successful");
     } catch (error) {
       console.error("An error occurred while checking out the book:", error);
     }
@@ -85,18 +88,16 @@ export default function BookPage() {
       }
     } catch (error) {
       console.error("An error occurred while fetching book data:", error);
-      Router.navigate("/find-books");
+      navigate("/find-books");
     }
   };
 
   useEffect(() => {
-    fetch().catch(console.error);
-  }, []);
-
-  if (!storage.isLoggedIn()) {
-    toast.info("Log in to continue");
-    Router.navigate("/login");
-  }
+    if (!storage.isLoggedIn()) {
+      toast.info("Log in to continue");
+      navigate("/login");
+    } else fetch().catch(console.error);
+  }, [stateChange]);
 
   const calculateAverageRating = () => {
     if (reviews.length === 0) {

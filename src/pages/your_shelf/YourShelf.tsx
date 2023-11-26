@@ -40,7 +40,7 @@ export default function YourShelf() {
   const extendLoanHandler = async (checkoutId: number) => {
     try {
       await Client.extendCheckout(checkoutId);
-
+      // TODO: admin panel tak samo
       window.location.reload();
     } catch (error) {
       console.error("An error occurred while extending the loan:", error);
