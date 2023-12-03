@@ -4,10 +4,12 @@ import BookResponse from "../../../interfaces/book/BookResponse";
 import ManageBookItem from "./ManageBookItem";
 import BookUpdate from "../../../interfaces/book/BookUpdate";
 import { Input } from "@nextui-org/react";
+import { toast } from "react-toastify";
 
 export default function ManageBook() {
   const [bookList, setBookList] = useState<BookResponse[]>([]);
   const [showBookList, setShowBookList] = useState<BookResponse[]>([]);
+  const [stateChange, setStateChange] = useState(true);
 
   const fetch = async () => {
     try {
@@ -23,6 +25,8 @@ export default function ManageBook() {
     await Client.deleteBook(bookId);
 
     setBookList((books) => books.filter((x) => x.id !== bookId));
+    setStateChange(!stateChange);
+    toast.success("Book deleted!");
   };
 
   const handeQuantityChange = async (
@@ -46,11 +50,13 @@ export default function ManageBook() {
     book.quantity_available = newQuantityAvailableNumber;
 
     setBookList([...bookList]);
+    setStateChange(!stateChange);
+    toast.success("Quantity of book changed!");
   };
 
   useEffect(() => {
     fetch().catch(console.error);
-  }, []);
+  }, [stateChange]);
 
   const filterBooks = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length === 0) {
