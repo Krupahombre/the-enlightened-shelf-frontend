@@ -16,11 +16,13 @@ import {
 import { useState, useEffect } from "react";
 import Client from "../../api/Client";
 import CheckoutResponse from "../../interfaces/checkout/CheckoutResponse";
+import { toast } from "react-toastify";
 
 export default function YourShelf() {
   const storage = new UserStorage();
   const [checkoutList, setCheckoutList] = useState<CheckoutResponse[]>([]);
   const [checkoutsNum, setCheckoutsNum] = useState<number>(0);
+  const [stateChange, setStateChange] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -35,13 +37,14 @@ export default function YourShelf() {
 
   useEffect(() => {
     fetchData().catch(console.error);
-  }, []);
+  }, [stateChange]);
 
   const extendLoanHandler = async (checkoutId: number) => {
     try {
       await Client.extendCheckout(checkoutId);
-      // TODO: admin panel tak samo
-      window.location.reload();
+
+      setStateChange(!stateChange);
+      toast.success("Loan extended!");
     } catch (error) {
       console.error("An error occurred while extending the loan:", error);
     }
@@ -51,7 +54,8 @@ export default function YourShelf() {
     try {
       await Client.returnCheckout(checkoutId);
 
-      window.location.reload();
+      setStateChange(!stateChange);
+      toast.success("Book returned!");
     } catch (error) {
       console.error("An error occurred while returning the book:", error);
     }
@@ -74,6 +78,7 @@ export default function YourShelf() {
   };
 
   if (!storage.isLoggedIn()) {
+    toast.info("Log in to continue");
     return <Navigate to="/login" replace />;
   }
 
