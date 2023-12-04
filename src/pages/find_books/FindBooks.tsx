@@ -65,8 +65,8 @@ export default function FindBooks() {
         />
         <Select
           items={categoryList}
-          label="Favorite Animal"
-          placeholder="Select an animal"
+          label="Category Search"
+          placeholder="Select category"
           className="w-80"
           onChange={handleSelectedCategory}
         >

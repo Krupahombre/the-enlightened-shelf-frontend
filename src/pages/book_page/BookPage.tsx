@@ -106,7 +106,7 @@ export default function BookPage() {
 
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
     const averageRating = totalRating / reviews.length;
-    return averageRating.toFixed(2);
+    return averageRating.toFixed(1);
   };
 
   const isAvailable = book?.quantity_available && book?.quantity_available > 0;
@@ -122,7 +122,7 @@ export default function BookPage() {
         <div className="flex justify-between">
           <h3 className="text-2xl font-bold">{book?.title}</h3>
           <p className="text-2xl font-bold">
-            Rating: {calculateAverageRating()}/5
+            Rating: {calculateAverageRating()}/5.0
           </p>
         </div>
         <h1 className="font-bold">{book?.author}</h1>

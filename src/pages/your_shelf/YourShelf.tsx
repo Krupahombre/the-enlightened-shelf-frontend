@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import UserStorage from "../../storage/UserStorage";
 import {
   Table,
@@ -90,10 +90,13 @@ export default function YourShelf() {
         </h3>
         <h1 className="font-bold">See your loans and increase their period</h1>
       </div>
-      <div className="mb-5">
+      <div className="flex flex-col items-center mb-3 gap-3">
         <p className="text-lg font-bold">Number of Checkouts: {checkoutsNum}</p>
+        <Button as={Link} to="/checkout-history">
+          Checkout history page
+        </Button>
       </div>
-      <Table isStriped aria-label="Checkout table">
+      <Table className="mb-3" isStriped aria-label="Checkout table">
         <TableHeader>
           <TableColumn>ID</TableColumn>
           <TableColumn>BOOK</TableColumn>

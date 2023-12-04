@@ -8,6 +8,7 @@ import AdminPage from "./admin_page/AdminPage";
 import YourShelf from "./your_shelf/YourShelf";
 import BookPage from "./book_page/BookPage";
 import ServerError from "./server_error/ServerError";
+import CheckoutHistory from "./checkout_history_page/CheckoutHistory";
 
 const Router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const Router = createBrowserRouter([
       {
         path: "server-error",
         element: <ServerError />,
+      },
+      {
+        path: "checkout-history",
+        element: <CheckoutHistory />,
       },
     ],
   },
