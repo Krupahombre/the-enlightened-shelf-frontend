@@ -12,14 +12,19 @@ import UserStorage from "../../storage/UserStorage";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Client from "../../api/Client";
+import CheckoutHistoryResponse from "../../interfaces/checkout/CheckoutHistoryResponse";
 
 export default function CheckoutHistory() {
   const storage = new UserStorage();
-  const [checkoutHistoryList, setCheckoutHistoryList] = useState([]);
+  const [checkoutHistoryList, setCheckoutHistoryList] = useState<
+    CheckoutHistoryResponse[]
+  >([]);
 
   const fetchData = async () => {
     try {
-      console.log("dupa");
+      const checkoutsHistory = await Client.getCheckoutsHistory();
+      setCheckoutHistoryList(checkoutsHistory.data);
     } catch (error) {
       console.error("An error occurred while fetching checkouts:", error);
     }
@@ -48,17 +53,23 @@ export default function CheckoutHistory() {
           <TableColumn>BOOK PAGE LINK</TableColumn>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>1</TableCell>
-            <TableCell>Five Nights at Freddy's: The Silver Eyes</TableCell>
-            <TableCell>2022</TableCell>
-            <TableCell>2023</TableCell>
-            <TableCell>
-              <Button as={Link} href={`/book-page/${1}`} showAnchorIcon>
-                Go to book page
-              </Button>
-            </TableCell>
-          </TableRow>
+          {checkoutHistoryList.map((checkout, index) => (
+            <TableRow key={checkout.id}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{checkout.book_title}</TableCell>
+              <TableCell>{checkout.checkout_date.replace("T", " ")}</TableCell>
+              <TableCell>{checkout.return_date.replace("T", " ")}</TableCell>
+              <TableCell>
+                <Button
+                  as={Link}
+                  href={`/book-page/${checkout.book_id}`}
+                  showAnchorIcon
+                >
+                  Go to book page
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>

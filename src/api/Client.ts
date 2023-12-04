@@ -12,6 +12,7 @@ import SignUp from "../interfaces/register/SignUp";
 import Router from "../pages/Router";
 import ToastError from "../interfaces/ToastError";
 import { toast } from "react-toastify";
+import CheckoutHistoryResponse from "../interfaces/checkout/CheckoutHistoryResponse";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -140,6 +141,10 @@ const Client = {
   addReview: (bookId: number, addReview: AddReview) =>
     axios
       .post<ResponseWrapper<ReviewResponse>>(`reviews/${bookId}`, addReview)
+      .then((response) => response.data),
+  getCheckoutsHistory: () =>
+    axios
+      .get<ResponseWrapper<CheckoutHistoryResponse[]>>(`checkouts/history`)
       .then((response) => response.data),
 };
 
