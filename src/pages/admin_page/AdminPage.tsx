@@ -5,6 +5,7 @@ import { Button, ButtonGroup, Divider } from "@nextui-org/react";
 import Checkouts from "./components/Checkouts";
 import { Navigate } from "react-router-dom";
 import UserStorage from "../../storage/UserStorage";
+import { toast } from "react-toastify";
 
 export default function AdminPage() {
   const [manageBookClick, setManageBookClick] = useState(true);
@@ -30,8 +31,12 @@ export default function AdminPage() {
     setCheckoutsClick(true);
   }
 
-  if (!storage.isAdmin()) {
+  if (!storage.isLoggedIn()) {
+    toast.info("Log in to continue");
     return <Navigate to="/login" replace />;
+  } else if (storage.isLoggedIn() && !storage.isAdmin()) {
+    toast.error("This page is restricted!");
+    return <Navigate to="/" replace />;
   }
 
   return (

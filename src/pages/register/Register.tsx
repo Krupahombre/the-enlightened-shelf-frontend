@@ -1,12 +1,17 @@
 import { Button, Card, CardBody, Input } from "@nextui-org/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SignUp from "../../interfaces/register/SignUp";
 import Client from "../../api/Client";
+import { useStorage } from "../../storage/Storage";
+import UserStorage from "../../storage/UserStorage";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
+  const { userStorage } = useStorage();
+  const storage = new UserStorage();
 
   const onSubmit = async (data: any) => {
     const registerData: SignUp = {
@@ -17,14 +22,21 @@ export default function Register() {
       password: data.password,
     };
 
+    console.log(registerData);
+
     const response = await Client.register(registerData);
 
-    localStorage.setItem("username", response.data.username);
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("role", response.data.role);
+    userStorage.setUser(response.data);
+
+    toast.success("Regsister successful");
 
     navigate("/");
   };
+
+  if (storage.isLoggedIn()) {
+    toast.info("Log out before registration");
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="flex justify-center items-center h-screen">

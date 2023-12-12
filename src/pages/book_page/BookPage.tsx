@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import BookResponse from "../../interfaces/book/BookResponse";
 import Client from "../../api/Client";
 import {
@@ -11,12 +11,23 @@ import {
   Chip,
   Divider,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Textarea,
   Tooltip,
 } from "@nextui-org/react";
 import UserStorage from "../../storage/UserStorage";
 import { BsInfoCircle } from "react-icons/bs";
 import Review from "./components/Review";
 import ReviewResponse from "../../interfaces/review/ReviewResponse";
+import { RatingData } from "./utils/RatingData";
+import AddReview from "../../interfaces/review/AddReview";
+import { toast } from "react-toastify";
 
 export default function BookPage() {
   const { bookId } = useParams();
@@ -24,12 +35,44 @@ export default function BookPage() {
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const storage = new UserStorage();
   const parsedBookId = bookId ? parseInt(bookId) : undefined;
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [addedComment, setAddedComment] = useState("");
+  const [addedRating, setAddedRating] = useState(0.0);
+  const [stateChange, setStateChange] = useState(true);
+  const navigate = useNavigate();
+
+  const handleOpenReviewModal = () => {
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    try {
+      console.log("Added Comment:", addedComment);
+      console.log("Added Rating:", addedRating);
+
+      const reviewData: AddReview = {
+        rating: addedRating,
+        comment: addedComment,
+      };
+      const idOfBook = book?.id || 0;
+      await Client.addReview(idOfBook, reviewData);
+
+      setIsReviewModalOpen(false);
+      setAddedComment("");
+      setAddedRating(0.0);
+      setStateChange(!stateChange);
+      toast.success("Review submitted!");
+    } catch (error) {
+      console.error("An error occurred while adding review:", error);
+    }
+  };
 
   const handleBookCheckout = async () => {
     try {
       const idOfBook = book?.id || 0;
       await Client.createCheckout(idOfBook);
-      window.location.reload();
+      setStateChange(!stateChange);
+      toast.success("Checkout successful");
     } catch (error) {
       console.error("An error occurred while checking out the book:", error);
     }
@@ -45,16 +88,16 @@ export default function BookPage() {
       }
     } catch (error) {
       console.error("An error occurred while fetching book data:", error);
+      navigate("/find-books");
     }
   };
 
   useEffect(() => {
-    fetch().catch(console.error);
-  }, []);
-
-  if (!storage.isLoggedIn()) {
-    return <Navigate to="/login" replace />;
-  }
+    if (!storage.isLoggedIn()) {
+      toast.info("Log in to continue");
+      navigate("/login");
+    } else fetch().catch(console.error);
+  }, [stateChange]);
 
   const calculateAverageRating = () => {
     if (reviews.length === 0) {
@@ -63,7 +106,7 @@ export default function BookPage() {
 
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
     const averageRating = totalRating / reviews.length;
-    return averageRating.toFixed(2);
+    return averageRating.toFixed(1);
   };
 
   const isAvailable = book?.quantity_available && book?.quantity_available > 0;
@@ -79,7 +122,7 @@ export default function BookPage() {
         <div className="flex justify-between">
           <h3 className="text-2xl font-bold">{book?.title}</h3>
           <p className="text-2xl font-bold">
-            Rating: {calculateAverageRating()}/5
+            Rating: {calculateAverageRating()}/5.0
           </p>
         </div>
         <h1 className="font-bold">{book?.author}</h1>
@@ -95,7 +138,7 @@ export default function BookPage() {
             </Chip>
           </div>
           <h1 className="font-bold">Description:</h1>
-          <p>{book?.description}</p>
+          <p className="overflow-y-scroll max-h-[200px]">{book?.description}</p>
         </div>
         <div className="w-1/4">
           <Card>
@@ -145,7 +188,12 @@ export default function BookPage() {
       </div>
       <Divider />
       <div className="flex flex-col gap-4 pb-5">
-        <p className="text-xl font-bold">Latest reviews:</p>
+        <div className="flex flex row justify-between">
+          <p className="text-xl font-bold">Latest reviews:</p>
+          <Button color="warning" onClick={handleOpenReviewModal}>
+            Leave a review
+          </Button>
+        </div>
         {reviews.length === 0 ? (
           <div className="flex justify-center">
             <p>No reviews yet! 🤔</p>
@@ -162,6 +210,56 @@ export default function BookPage() {
           ))
         )}
       </div>
+      <Modal
+        isOpen={isReviewModalOpen}
+        onOpenChange={() => (
+          setIsReviewModalOpen(!isReviewModalOpen),
+          setAddedComment(""),
+          setAddedRating(0.0)
+        )}
+        backdrop="blur"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            Leave a Review
+          </ModalHeader>
+          <ModalBody>
+            <Select
+              label="Select rating"
+              value={addedRating.toString()}
+              onChange={(e) => setAddedRating(Number(e.target.value))}
+            >
+              {RatingData.map((rating) => (
+                <SelectItem key={rating.value} value={rating.value.toString()}>
+                  {rating.label}
+                </SelectItem>
+              ))}
+            </Select>
+            <Textarea
+              label="Comment"
+              variant="bordered"
+              value={addedComment}
+              onChange={(event) => setAddedComment(event.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="danger"
+              variant="light"
+              onPress={() => {
+                setIsReviewModalOpen(false);
+                setAddedComment("");
+                setAddedRating(0.0);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button color="success" onPress={handleSubmitReview}>
+              Submit review
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

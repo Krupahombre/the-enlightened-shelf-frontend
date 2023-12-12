@@ -9,6 +9,7 @@ import {
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useStorage } from "../../storage/Storage";
 import { observer } from "mobx-react-lite";
+import { toast } from "react-toastify";
 
 export default observer(function Header() {
   const userImage = "src/assets/default-user.jpg";
@@ -19,6 +20,7 @@ export default observer(function Header() {
   const handleLogout = () => {
     userStorage.logoutUser();
 
+    toast.success("Logout successful");
     navigate("/");
   };
 

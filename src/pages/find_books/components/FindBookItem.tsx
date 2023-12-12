@@ -1,4 +1,4 @@
-import { Button, ScrollShadow } from "@nextui-org/react";
+import { Button, Chip, ScrollShadow } from "@nextui-org/react";
 import { Link } from "react-router-dom";
 
 interface FindBookItemProps {
@@ -7,6 +7,7 @@ interface FindBookItemProps {
   title: string;
   author: string;
   description: string;
+  category: string;
 }
 
 export default function FindBookItem({
@@ -15,13 +16,17 @@ export default function FindBookItem({
   title,
   description,
   author,
+  category,
 }: FindBookItemProps) {
   return (
     <div className="flex p-6 rounded-lg border-2 h-96">
       <img src={imgUrl} alt="" className="h-full rounded-md w-1/4" />
-      <div className="flex flex-col pl-6 w-full">
+      <div className="flex flex-col pl-6 w-full gap-2">
         <h1 className="text-xl font-bold">{title}</h1>
         <h3 className="text-lg">{author}</h3>
+        <Chip color="warning" variant="dot">
+          {category}
+        </Chip>
         {/* <p className="opacity-75 h-80 overflow-y-scroll">{description}</p> */}
         <ScrollShadow hideScrollBar className="h-80 overflow-y-scroll">
           <p>{description}</p>

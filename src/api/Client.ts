@@ -1,6 +1,5 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Auth from "../interfaces/auth/Auth";
-import Register from "../interfaces/register/SignUp";
 import AuthResponse from "../interfaces/auth/AuthResponse";
 import ResponseWrapper from "../interfaces/ResponseWrapper";
 import AddBook from "../interfaces/book/AddBook";
@@ -9,6 +8,11 @@ import BookUpdate from "../interfaces/book/BookUpdate";
 import CheckoutResponse from "../interfaces/checkout/CheckoutResponse";
 import ReviewResponse from "../interfaces/review/ReviewResponse";
 import AddReview from "../interfaces/review/AddReview";
+import SignUp from "../interfaces/register/SignUp";
+import Router from "../pages/Router";
+import ToastError from "../interfaces/ToastError";
+import { toast } from "react-toastify";
+import CheckoutHistoryResponse from "../interfaces/checkout/CheckoutHistoryResponse";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -24,12 +28,59 @@ axios.interceptors.request.use((setup) => {
   return setup;
 });
 
+axios.interceptors.response.use(
+  (response) => {
+    // toast.success("Success!");
+    return response;
+  },
+  (error: AxiosError) => {
+    if (error.response) {
+      const { status, data } = error.response;
+      const dataError = data as ToastError;
+
+      switch (status) {
+        case 400: {
+          toast.error("Bad request");
+          break;
+        }
+
+        case 403: {
+          toast.error("Couldn't authenticate - please log in");
+          break;
+        }
+
+        case 401: {
+          toast.error("Only for admins!");
+          Router.navigate("/");
+          break;
+        }
+
+        case 404:
+        case 409:
+        case 422: {
+          toast.error(dataError.detail);
+          break;
+        }
+
+        case 500: {
+          Router.navigate("/server-error");
+          break;
+        }
+      }
+    } else if (error.message === "Network Error" && !error.response) {
+      toast.error("Network error - make sure API is running!");
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 const Client = {
   login: (auth: Auth) =>
     axios
       .post<ResponseWrapper<AuthResponse>>(`/auth/login`, auth)
       .then((response) => response.data),
-  register: (register: Register) =>
+  register: (register: SignUp) =>
     axios
       .post<ResponseWrapper<AuthResponse>>(`/auth/register`, register)
       .then((response) => response.data),
@@ -71,6 +122,18 @@ const Client = {
     axios
       .post<ResponseWrapper<CheckoutResponse>>(`checkouts/book/${bookId}`)
       .then((response) => response.data),
+  extendCheckout: (checkout_id: number) =>
+    axios
+      .put<ResponseWrapper<CheckoutResponse>>(
+        `/checkouts/extend-loan/${checkout_id}`
+      )
+      .then((response) => response.data),
+  returnCheckout: (checkout_id: number) =>
+    axios
+      .delete<ResponseWrapper<CheckoutResponse>>(
+        `/checkouts/return/${checkout_id}`
+      )
+      .then((response) => response.data),
   getReviews: (bookId: number) =>
     axios
       .get<ResponseWrapper<ReviewResponse[]>>(`reviews/${bookId}`)
@@ -78,6 +141,10 @@ const Client = {
   addReview: (bookId: number, addReview: AddReview) =>
     axios
       .post<ResponseWrapper<ReviewResponse>>(`reviews/${bookId}`, addReview)
+      .then((response) => response.data),
+  getCheckoutsHistory: () =>
+    axios
+      .get<ResponseWrapper<CheckoutHistoryResponse[]>>(`checkouts/history`)
       .then((response) => response.data),
 };
 
